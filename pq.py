@@ -397,12 +397,12 @@ class VideoEditor(QWidget):
         queryEditor_subtitle.setAlignment(Qt.AlignTop)
         queryEditor_layout.addWidget(queryEditor_subtitle)
 
-        im = QLabel()
-        im.setPixmap(QPixmap('./resource/icon/dragndrop.png'))
-        im.setFixedWidth(500)
-        im.setFixedHeight(500)
-        im.setAlignment(Qt.AlignHCenter)
-        queryEditor_layout.addWidget(im)
+        self.profileImage= QLabel()
+        self.profileImage.setPixmap(QPixmap('./resource/icon/dragndrop.png'))
+        self.profileImage.setFixedWidth(500)
+        self.profileImage.setFixedHeight(500)
+        self.profileImage.setAlignment(Qt.AlignHCenter)
+        queryEditor_layout.addWidget(self.profileImage)
 
         tools = QLabel('tool')
 
@@ -417,24 +417,25 @@ class VideoEditor(QWidget):
         mainForm.addLayout(center_layout)
 
         self.setLayout(mainForm)
-        self.upload_btn.clicked.connect(self.OnUploadBtnClicked)
 
-        # self.frameExtractor.read.connect(self.addRow)
+        self.upload_btn.clicked.connect(self.OnUploadBtnClicked)
         self.frameExtractor.finished.connect(self.FinishExtractFrames)
         self.frameTable_selectioModel.selectionChanged.connect(self.selectFrames)
         self.frameTable_filter_combobox.currentIndexChanged.connect(self.OnFrameTableFiltercomboBoxChanged)
-
         self.toQueryEditorBtn.clicked.connect(self.OnToQueryEditorBtnClicked)
 
-        # self.frameList.clicked.connect(self.selectFrames)
-        # self.frameList.drag.connect(self.selectFrames)
 
     def OnToQueryEditorBtnClicked(self):
+        l = os.listdir(self.tmp_frame_dir)
         start = int(self.selected_filter_start.text())
         end = int(self.selected_filter_end.text())
-        frame_idx = int((end - start + 1) / 2) + start
-        l = os.listdir(self.tmp_frame_dir)
+        frame_idx = min(max(0,int((end - start + 1) / 2) + start),len(l)-1)
+
         print(frame_idx, l[frame_idx])
+        self.profileImage.setPixmap(QPixmap(os.path.join(self.tmp_frame_dir,l[frame_idx])))
+        self.profileImage.setFixedWidth(500)
+        self.profileImage.setFixedHeight(500)
+
 
     def OnFrameTableFilterApplyBtnClicked(self):
         self.frameTable.reset()
